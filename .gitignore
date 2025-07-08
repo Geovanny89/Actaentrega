@@ -1,11 +1,12 @@
-#node_modules
-# Node.js
+# Node modules
 node_modules/
 
 # Logs
 logs/
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Dependency directories
 pids/
@@ -13,14 +14,28 @@ pids/
 *.seed
 *.pid.lock
 
-# Optional npm cache directory
+# Optional npm/yarn cache
 .npm/
+.yarn/
 
-# Optional eslint cache
+# ESLint / testing cache
 .eslintcache
+.cache/
 
-# Optional REPL history
+# REPL
 .node_repl_history
 
 # Environment variables
 .env*
+!.env.example
+
+# Build output
+/build
+/dist
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Vercel
+.vercel/
