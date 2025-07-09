@@ -45,9 +45,10 @@ function App() {
       doc.setFontSize(12);
 
       // Fecha alineada a la derecha
-      doc.text(`San José de Cúcuta, ${form.fecha}`, 210 - marginX, y, {
-        align: "right",
-      });
+     
+      // doc.text(`San José de Cúcuta, ${form.fecha}`, 210 - marginX, y, {
+      //   align: "right",
+      // });
 
       // Título centrado
       doc.setFontSize(14);
