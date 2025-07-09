@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import "./app.css"; // Importa los estilos externos
+import "./app.css"; // Estilos externos
 
 function App() {
   const [form, setForm] = useState({
@@ -32,75 +32,108 @@ function App() {
     const doc = new jsPDF();
 
     const img = new Image();
-    img.src = "/image.png"; // Asegúrate de que esté en public/
+    img.src = "/image.png"; // Debe estar en public/
 
     img.onload = () => {
-      doc.addImage(img, "JPEG", 0, 0, 210, 297);
+      doc.addImage(img, "JPEG", 0, 0, 210, 297); // Fondo o encabezado
 
+      let y = 20;
+      const marginX = 20;
+      const lineHeight = 8;
+
+      doc.setFont("helvetica", "normal");
       doc.setFontSize(12);
-      doc.text("San José de Cúcuta, " + form.fecha, 20, 20);
+
+      // Fecha alineada a la derecha
+      doc.text(`San José de Cúcuta, ${form.fecha}`, 210 - marginX, y, {
+        align: "right",
+      });
+
+      // Título centrado
       doc.setFontSize(14);
-      doc.text("ACTA DE ENTREGA DE ELEMENTOS", 60, 30);
+      doc.setFont("helvetica", "bold");
+      y += 15;
+      doc.text("ACTA DE ENTREGA DE ELEMENTOS", 105, y, { align: "center" });
 
+      // Datos del colaborador
       doc.setFontSize(12);
-      doc.text(`Nombre del empleado: ${form.nombre}`, 20, 45);
-      doc.text(`Número de documento de identidad: ${form.cedula}`, 20, 52);
-      doc.text(`Cargo: ${form.cargo}`, 20, 59);
+      doc.setFont("helvetica", "normal");
+      y += 20;
+      doc.text(`Nombre del empleado: ${form.nombre}`, marginX, y);
+      y += lineHeight;
+      doc.text(`Número de documento de identidad: ${form.cedula}`, marginX, y);
+      y += lineHeight;
+      doc.text(`Cargo: ${form.cargo}`, marginX, y);
 
+      // Introducción
+      y += lineHeight * 2;
       doc.text(
-        "Por medio de la presente, se hace constar que el día " +
-          form.fecha +
-          ", se ha entregado al empleado mencionado los siguientes elementos:",
-        20,
-        70,
+        `Por medio de la presente, se hace constar que el día ${form.fecha}, se ha entregado al empleado mencionado los siguientes elementos:`,
+        marginX,
+        y,
         { maxWidth: 170 }
       );
 
+      // Tabla
+      y += lineHeight * 2;
       doc.autoTable({
-        startY: 80,
+        startY: y,
         head: [["REFERENCIA", "MARCA", "SERIAL"]],
         body: elementos.map((e) => [e.referencia, e.marca, e.serial]),
         theme: "grid",
         headStyles: { fillColor: [41, 128, 185] },
+        margin: { left: marginX, right: marginX },
       });
 
-      let y = doc.lastAutoTable.finalY + 10;
-      doc.text("Condiciones de uso:", 20, y);
-      y += 8;
-      doc.text(
+      y = doc.lastAutoTable.finalY + 10;
+
+      // Condiciones
+      doc.setFont("helvetica", "bold");
+      doc.text("Condiciones de uso:", marginX, y);
+      doc.setFont("helvetica", "normal");
+
+      const condiciones = [
         "- Responsabilidad: El empleado es responsable del cuidado y conservación del elemento.",
-        20,
-        y
-      );
-      y += 7;
-      doc.text(
         "- Pérdida o daño: El empleado deberá asumir el costo total de reposición.",
-        20,
-        y
-      );
-      y += 7;
-      doc.text(
         "- Obligación de notificación: Deberá informar a su responsable cualquier novedad.",
-        20,
-        y
-      );
-      y += 7;
-      doc.text(
         "- Devolución: Se compromete a devolver el elemento al finalizar su relación laboral.",
-        20,
-        y
-      );
-      y += 12;
-      doc.text("Observaciones: " + form.observaciones, 20, y);
-      y += 20;
+      ];
 
-      doc.text("Firma del colaborador: ______________________", 20, y);
-      doc.text("C.C: " + form.cedula, 140, y);
-      y += 15;
-      doc.text("Firma del responsable: ______________________", 20, y);
-      doc.text("C.C: ____________________", 140, y);
+      condiciones.forEach((cond) => {
+        y += lineHeight;
+        doc.text(cond, marginX, y);
+      });
 
-      doc.save("acta_entrega.pdf");
+      // Observaciones
+      y += lineHeight * 3;
+
+// Coordenadas para columnas
+const leftX = 20;
+const rightX = 115;
+
+doc.setFont("helvetica", "bold");
+doc.text("Firma del colaborador:", leftX, y);
+doc.text("Firma del responsable:", rightX, y);
+
+y += lineHeight;
+doc.setFont("helvetica", "normal");
+doc.text("______________________________", leftX, y);
+doc.text("______________________________", rightX, y);
+
+y += lineHeight;
+doc.text(form.nombre || "Nombre del colaborador", leftX, y);
+doc.text("Geovanni Casadiegos Rodríguez", rightX, y);
+
+y += lineHeight;
+doc.text(`C.C: ${form.cedula || "___________"}`, leftX, y);
+doc.text("C.C: 1090409087", rightX, y);
+
+y += lineHeight;
+doc.text(form.cargo || "Cargo del colaborador", leftX, y);
+doc.text("Coordinador de Sistemas y TIC", rightX, y);
+
+
+      doc.save(`${form.cedula}.pdf`);
     };
   };
 
@@ -135,9 +168,7 @@ function App() {
           <input
             placeholder="Marca"
             value={el.marca}
-            onChange={(e) =>
-              handleElementoChange(idx, "marca", e.target.value)
-            }
+            onChange={(e) => handleElementoChange(idx, "marca", e.target.value)}
           />
           <input
             placeholder="Serial"
